@@ -1,0 +1,79 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      new Contracts
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">new Contracts</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-list>
+    <ion-radio-group [(ngModel)] = "curNetWork">
+      <ion-list-header>
+        <ion-label>NetWork</ion-label>
+      </ion-list-header>
+
+      <!-- <ion-item>
+        <ion-label>mainNet</ion-label>
+        <ion-radio slot="start" value="mainNet"></ion-radio>
+      </ion-item> -->
+
+      <ion-item>
+        <ion-label>testNet</ion-label>
+        <ion-radio slot="start" value="testNet"></ion-radio>
+      </ion-item>
+
+    </ion-radio-group>
+  </ion-list>
+  <p>{{tokenInfo}}</p>
+  <ion-item>
+    <ion-label>tokenId</ion-label>
+    <ion-input [(ngModel)]="tokenId"></ion-input>
+  </ion-item>
+
+  <br/>
+  <ion-button (click)="getTotalSupply()">
+    getTokenInfo()
+  </ion-button>
+  <br/>
+  <ion-button (click)="getExatTokenIfo()">
+    getExatTokenIfo()
+  </ion-button>
+  <br/>
+  <ion-button (click)="getBalance()">
+    getBalance()
+  </ion-button>
+  <br/>
+  <!-- <ion-button (click)="testSetApprovalForAll()">
+    testSetApprovalForAll()
+  </ion-button> -->
+
+  <!-- <ion-button (click)="createOrderForSale()">
+    createOrderForSale()
+  </ion-button> -->
+  <br/>
+  <!-- <ion-button (click)="getSellerCount()">
+    getSellerCount()
+  </ion-button> -->
+ <round-progress [current]="current" [max]="max"></round-progress>
+ <round-progress
+    [current]="current"
+    [max]="max"
+    [color]="'#45ccce'"
+    [background]="'#eaeaea'"
+    [radius]="125"
+    [stroke]="20"
+    [semicircle]="true"
+    [rounded]="true"
+    [clockwise]="false"
+    [responsive]="false"
+    [duration]="800"
+    [animation]="'easeInOutQuart'"
+    [animationDelay]="0"
+    (onRender)="doSomethingWithCurrentValue($event)"></round-progress>
+</ion-content>
