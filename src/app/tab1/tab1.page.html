@@ -31,6 +31,7 @@
   </ion-list>
   <p *ngIf="notSale!=null">未出售的个数：{{notSale}}</p>
   <p *ngIf="saleCount!=null">正在出售的个数：{{saleCount}}</p>
+  <p *ngIf="activeCount!=null">活动面板的的个数：{{activeCount}}</p>
   <p>{{tokenContent}}</p>
   <p>{{jsonUri}}</p>
   <ion-item>
@@ -66,4 +67,14 @@
   <ion-button (click)="getOpenOrderCount()">
     getOpenOrderCount()
   </ion-button>
+
+  <ion-button (click)="getActivePanelCount()">
+    getActivePanelCount()
+  </ion-button>
+
+  <ion-button (click)="getAllActivePanel()">
+    getAllActivePanel()
+  </ion-button>
+
+
 </ion-content>

@@ -9,6 +9,7 @@ import Web3 from "web3";
 export class Tab1Page {
   public tokenContent: string = "";
   public stickerABI: string = "";
+  public galleriaABI: string = "";
   private web3:any;
   public curNetWork: string = "mainNet";
   private testBridge: string = "https://api-testnet.trinity-tech.cn/eth";
@@ -18,11 +19,12 @@ export class Tab1Page {
     /** MainNet contract */
   public STICKER_ADDRESS: string = '0x020c7303664bc88ae92cE3D380BF361E03B78B81';
   public PASAR_ADDRESS: string = '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0';
+  public GALLERIA_ADDRESS: string = '';
 
   /** TestNet contract */
   public  STICKER_TEST_ADDRESS: string = '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961';
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
-
+  public  GALLERIA_TEST_ADDRESS: string = '0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95';
   /** MainNet IPFS */
   public IPFS_SERVER: string = 'https://ipfs.trinity-feeds.app/';
 
@@ -39,6 +41,8 @@ export class Tab1Page {
 
   public notSale:number = null;
 
+  public activeCount: number = null;
+
   constructor(public loadingController: LoadingController) {
 
   }
@@ -46,6 +50,7 @@ export class Tab1Page {
   ngOnInit() {
     this.stickerABI = require("../../assets/contracts/stickerABI.json");
     this.pasarABI = require("../../assets/contracts/pasarABI.json");
+    this.galleriaABI = require("../../assets/contracts/galleriaABI.json");
     console.log("this.stickerABI",this.stickerABI)
     this.handleContracts(this.curNetWork);
   }
@@ -212,7 +217,7 @@ async getSaleCount(){
     if(this.curNetWork === "testNet"){
        pasarAddr = this.PASAR_TEST_ADDRESS;
     }else{
-       pasarAddr = this.PASAR_TEST_ADDRESS;
+       pasarAddr = this.PASAR_ADDRESS;
     }
 
     const pasarContract = new this.web3.eth.Contract(this.pasarABI,pasarAddr);
@@ -222,4 +227,46 @@ async getSaleCount(){
     this.tokenContent = JSON.stringify(tokenInfo);
   }
 
+  async getActivePanelCount(){
+    await this.getWeb3();
+
+    let galleriaAddr = "";
+    if(this.curNetWork === "testNet"){
+      galleriaAddr = this.GALLERIA_TEST_ADDRESS;
+    }else{
+      galleriaAddr = this.GALLERIA_ADDRESS;
+    }
+
+    const galleriaContract = new this.web3.eth.Contract(this.galleriaABI,galleriaAddr);
+
+    let tokenInfo =  await galleriaContract.methods.getActivePanelCount().call();
+
+    this.tokenContent = JSON.stringify(tokenInfo);
+  }
+
+  async getAllActivePanel(){
+    await this.getWeb3();
+
+    let galleriaAddr = "";
+    if(this.curNetWork === "testNet"){
+      galleriaAddr = this.GALLERIA_TEST_ADDRESS;
+    }else{
+      galleriaAddr = this.GALLERIA_ADDRESS;
+    }
+
+    const galleriaContract = new this.web3.eth.Contract(this.galleriaABI,galleriaAddr);
+
+    let tokenInfo =  await galleriaContract.methods.getActivePanelCount().call();
+    this.activeCount = parseInt(tokenInfo)
+    let arr = {};
+    for (let index = 0; index < this.activeCount; index++) {
+      try {
+        const item = await galleriaContract.methods.getActivePanelByIndex(index).call();
+        arr[index] = item;
+      } catch (error) {
+        console.error("Get Sale item error", error);
+      }
+    }
+    this.tokenContent = JSON.stringify(arr);
+  }
 }
