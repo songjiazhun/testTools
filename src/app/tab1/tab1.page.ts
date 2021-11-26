@@ -271,6 +271,42 @@ async getSaleCount(){
     this.tokenContent = JSON.stringify(arr);
   }
 
+  async getPanelById(){
+    if(this.tokenId===""){
+      return;
+    }
+    await this.getWeb3();
+
+    let galleriaAddr = "";
+    if(this.curNetWork === "testNet"){
+      galleriaAddr = this.GALLERIA_TEST_ADDRESS;
+    }else{
+      galleriaAddr = this.GALLERIA_ADDRESS;
+    }
+
+    const galleriaContract = new this.web3.eth.Contract(this.galleriaABI,galleriaAddr);
+
+    let tokenInfo =  await galleriaContract.methods.getPanelById(this.tokenId).call();
+
+    this.tokenContent = JSON.stringify(tokenInfo);
+
+  }
+
+  async getTokenAddress(){
+    await this.getWeb3();
+
+    let galleriaAddr = "";
+    if(this.curNetWork === "testNet"){
+      galleriaAddr = this.GALLERIA_TEST_ADDRESS;
+    }else{
+      galleriaAddr = this.GALLERIA_ADDRESS;
+    }
+    const galleriaContract = new this.web3.eth.Contract(this.galleriaABI,galleriaAddr);
+    const info = await galleriaContract.methods.getTokenAddress().call();
+    this.tokenContent = info;
+
+  }
+
 
   hex2dec(){
     if(this.tokenId===""){
