@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
+import BigNumber from 'bignumber.js';
 import Web3 from "web3";
 @Component({
   selector: 'app-tab1',
@@ -268,5 +269,43 @@ async getSaleCount(){
       }
     }
     this.tokenContent = JSON.stringify(arr);
+  }
+
+
+  hex2dec(){
+    if(this.tokenId===""){
+      return;
+    }
+    let dec = new BigNumber(this.tokenId);
+    let decStr = dec.toFormat({prefix:""});
+    this.tokenContent = JSON.stringify(decStr);
+  }
+
+  hex2dec1(){
+    if(this.tokenId===""){
+      return;
+    }
+    let decStr = this.dec2hex();
+    this.tokenContent = JSON.stringify(decStr);
+  }
+
+  dec2hex(){
+    let dec:any = this.tokenId.toString().split('') || [],
+    sum = [],
+    hex = [],
+    i:any,
+    s:any
+    while(dec.length){
+        s = 1 * dec.shift();
+        for(i = 0; s || i < sum.length; i++){
+            s += (sum[i] || 0) * 10
+            sum[i] = s % 16
+            s = (s - sum[i]) / 16
+        }
+    }
+    while(sum.length){
+        hex.push(sum.pop().toString(16))
+    }
+    return hex.join('')
   }
 }
