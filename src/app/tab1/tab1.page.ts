@@ -11,18 +11,22 @@ export class Tab1Page {
   public tokenContent: string = "";
   public stickerABI: string = "";
   public galleriaABI: string = "";
+  public diamondABI: string = "";
   private web3:any;
   public curNetWork: string = "mainNet";
   private testBridge: string = "https://api-testnet.trinity-tech.cn/eth";
   private mainBridge: string = "https://api.trinity-tech.cn/eth";
   private curBridge: string = "";
 
+
     /** MainNet contract */
+  public DIAMONd_ADDRESS: string = '0x2C8010Ae4121212F836032973919E8AeC9AEaEE5';
   public STICKER_ADDRESS: string = '0x020c7303664bc88ae92cE3D380BF361E03B78B81';
   public PASAR_ADDRESS: string = '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0';
   public GALLERIA_ADDRESS: string = '';
 
   /** TestNet contract */
+  public DIAMONd_TEST_ADDRESS: string = '';
   public  STICKER_TEST_ADDRESS: string = '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961';
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
   public  GALLERIA_TEST_ADDRESS: string = '0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95';
@@ -52,7 +56,8 @@ export class Tab1Page {
     this.stickerABI = require("../../assets/contracts/stickerABI.json");
     this.pasarABI = require("../../assets/contracts/pasarABI.json");
     this.galleriaABI = require("../../assets/contracts/galleriaABI.json");
-    console.log("this.stickerABI",this.stickerABI)
+    this.diamondABI = require("../../assets/contracts/diamond.json");
+    console.log("this.stickerABI",this.stickerABI);
     this.handleContracts(this.curNetWork);
   }
 
@@ -141,7 +146,8 @@ async setBridge(type: string){
     }
 
     const balance = await new this.web3.eth.getBalance(this.tokenId);
-    this.tokenContent = JSON.stringify(balance);
+    let balance1 = this.web3.utils.fromWei(balance, 'ether');
+    this.tokenContent = JSON.stringify(balance1);
   }
 
 
@@ -343,5 +349,21 @@ async getSaleCount(){
         hex.push(sum.pop().toString(16))
     }
     return hex.join('')
+  }
+
+ async getDiaBalance(){
+    await this.getWeb3();
+    let diamondAddr = "";
+    if(this.curNetWork === "testNet"){
+      diamondAddr = this.DIAMONd_TEST_ADDRESS;
+    }else{
+      diamondAddr =  this.DIAMONd_ADDRESS;
+    }
+    const diamondContract = new this.web3.eth.Contract(this.diamondABI,diamondAddr);
+
+    const info = await diamondContract.methods.balanceOf(this.tokenId).call();
+    let balance = this.web3.utils.fromWei(info, 'ether');
+    this.tokenContent = JSON.stringify(balance);
+
   }
 }
