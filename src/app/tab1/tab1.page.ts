@@ -23,13 +23,13 @@ export class Tab1Page {
   public DIAMONd_ADDRESS: string = '0x2C8010Ae4121212F836032973919E8AeC9AEaEE5';
   public STICKER_ADDRESS: string = '0x020c7303664bc88ae92cE3D380BF361E03B78B81';
   public PASAR_ADDRESS: string = '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0';
-  public GALLERIA_ADDRESS: string = '';
+  public GALLERIA_ADDRESS: string = '0xE91F413953A82E15B92Ffb93818d8a7b87C3939B';
 
   /** TestNet contract */
   public DIAMONd_TEST_ADDRESS: string = '';
   public  STICKER_TEST_ADDRESS: string = '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961';
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
-  public  GALLERIA_TEST_ADDRESS: string = '0xF63f820F4a0bC6E966D61A4b20d24916713Ebb95';
+  public  GALLERIA_TEST_ADDRESS: string = '0x8b3c7Fc42d0501e0367d29426421D950f45F5041';
   /** MainNet IPFS */
   public IPFS_SERVER: string = 'https://ipfs.trinity-feeds.app/';
 
@@ -365,5 +365,31 @@ async getSaleCount(){
     let balance = this.web3.utils.fromWei(info, 'ether');
     this.tokenContent = JSON.stringify(balance);
 
+  }
+
+ async getGFeeParams(){
+    await this.getWeb3();
+    let galleriaAddr = "";
+    if(this.curNetWork === "testNet"){
+      galleriaAddr = this.GALLERIA_TEST_ADDRESS;
+    }else{
+      galleriaAddr = this.GALLERIA_ADDRESS;
+    }
+    const galleriaContract = new this.web3.eth.Contract(this.galleriaABI,galleriaAddr);
+    const info = await galleriaContract.methods.getFeeParams().call();
+    this.tokenContent = JSON.stringify(info);
+  }
+
+  async getPFeeParams(){
+    await this.getWeb3();
+    let galleriaAddr = "";
+    if(this.curNetWork === "testNet"){
+      galleriaAddr = this.PASAR_TEST_ADDRESS;
+    }else{
+      galleriaAddr = this.PASAR_ADDRESS;
+    }
+    const galleriaContract = new this.web3.eth.Contract(this.pasarABI,galleriaAddr);
+    const info = await galleriaContract.methods.getPlatformFee().call();
+    this.tokenContent = JSON.stringify(info);
   }
 }
