@@ -12,6 +12,7 @@ export class Tab1Page {
   public stickerABI: string = "";
   public galleriaABI: string = "";
   public diamondABI: string = "";
+  public metABI: string = "";
   private web3:any;
   public curNetWork: string = "mainNet";
   private testBridge: string = "https://api-testnet.trinity-tech.cn/eth";
@@ -30,6 +31,7 @@ export class Tab1Page {
   public  STICKER_TEST_ADDRESS: string = '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961';
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
   public  GALLERIA_TEST_ADDRESS: string = '0x8b3c7Fc42d0501e0367d29426421D950f45F5041';
+  public  MET_TEST_ADDRESS: string = '0x7c0c3c566beCBB454Ce867a67C0faAfBe1D24590'
   /** MainNet IPFS */
   public IPFS_SERVER: string = 'https://ipfs.trinity-feeds.app/';
 
@@ -57,6 +59,7 @@ export class Tab1Page {
     this.pasarABI = require("../../assets/contracts/pasarABI.json");
     this.galleriaABI = require("../../assets/contracts/galleriaABI.json");
     this.diamondABI = require("../../assets/contracts/diamond.json");
+    this.metABI = require("../../assets/contracts/metABI.json");
     console.log("this.stickerABI",this.stickerABI);
     this.handleContracts(this.curNetWork);
   }
@@ -158,7 +161,7 @@ async setBridge(type: string){
     }else{
       baseUrl = this.IPFS_SERVER;
     }
-    baseUrl = baseUrl+"ipfs/"+this.jsonUri.replace("feeds:json:","");
+    baseUrl = baseUrl+"ipfs/"+this.jsonUri.replace("feeds:json:","").replace("meteast:json:","");;
     window.open(baseUrl, "_blank");
   }
 
@@ -391,5 +394,24 @@ async getSaleCount(){
     const galleriaContract = new this.web3.eth.Contract(this.pasarABI,galleriaAddr);
     const info = await galleriaContract.methods.getPlatformFee().call();
     this.tokenContent = JSON.stringify(info);
+  }
+
+  async getMetTokenInfo(){
+    await this.getWeb3();
+    if(this.tokenId===""){
+        return;
+    }
+    let metAddr = "";
+    if(this.curNetWork === "testNet"){
+       metAddr = this.MET_TEST_ADDRESS;
+    }else{
+       metAddr = this.STICKER_ADDRESS;
+    }
+
+    const metContract = new this.web3.eth.Contract(this.metABI,metAddr);
+
+    let tokenInfo =  await metContract.methods.tokenInfo(this.tokenId).call();
+    this.jsonUri = tokenInfo[3];
+    this.tokenContent = JSON.stringify(tokenInfo);
   }
 }
