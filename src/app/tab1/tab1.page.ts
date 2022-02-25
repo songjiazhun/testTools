@@ -31,7 +31,7 @@ export class Tab1Page {
   public  STICKER_TEST_ADDRESS: string = '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961';
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
   public  GALLERIA_TEST_ADDRESS: string = '0x8b3c7Fc42d0501e0367d29426421D950f45F5041';
-  public  MET_TEST_ADDRESS: string = '0x7c0c3c566beCBB454Ce867a67C0faAfBe1D24590'
+  public  MET_TEST_ADDRESS: string = '0x15319c02e6f6b4FcB90b465c135c63dc84B9afFC'
   /** MainNet IPFS */
   public IPFS_SERVER: string = 'https://ipfs.trinity-feeds.app/';
 
