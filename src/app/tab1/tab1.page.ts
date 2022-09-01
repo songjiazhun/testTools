@@ -2,21 +2,27 @@ import { Component } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
 import BigNumber from 'bignumber.js';
 import Web3 from "web3";
+import { Claims, DIDDocument, JWTParserBuilder, JWT, DID, DIDURL, DIDBackend, DefaultDIDAdapter, JSONObject, VerifiableCredential, VerifiablePresentation, JWTHeader } from '@elastosfoundation/did-js-sdk';
 @Component({
   selector: 'app-tab1',
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss']
 })
+
+//Channel Registry proxy contract deployed to: 0xc76E72deE2021cc51b094AfcD1e7010c74037bcB
+//Channel Registry logic contract deployed to: 0xbfD859e5f5bFE659417cBb66d04f24294ddd1Ef3
 export class Tab1Page {
   public tokenContent: string = "";
   public stickerABI: string = "";
   public galleriaABI: string = "";
   public diamondABI: string = "";
   public metABI: string = "";
+  public channelRegistryABI: string = '';
+
   private web3:any;
   public curNetWork: string = "mainNet";
-  private testBridge: string = "https://api-testnet.trinity-tech.cn/eth";
-  private mainBridge: string = "https://api.trinity-tech.cn/eth";
+  private testBridge: string = "https://api-testnet.elastos.io/eth";
+  private mainBridge: string = "https://api.elastos.io/eth";
   private curBridge: string = "";
 
 
@@ -25,13 +31,14 @@ export class Tab1Page {
   public STICKER_ADDRESS: string = '0x020c7303664bc88ae92cE3D380BF361E03B78B81';
   public PASAR_ADDRESS: string = '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0';
   public GALLERIA_ADDRESS: string = '0xE91F413953A82E15B92Ffb93818d8a7b87C3939B';
-
+  public CHANNEL_REGISTRY_ADDRESS: string = '';
   /** TestNet contract */
-  public DIAMONd_TEST_ADDRESS: string = '';
+  public  DIAMONd_TEST_ADDRESS: string = '';
   public  STICKER_TEST_ADDRESS: string = '0xed1978c53731997f4DAfBA47C9b07957Ef6F3961';
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
   public  GALLERIA_TEST_ADDRESS: string = '0x8b3c7Fc42d0501e0367d29426421D950f45F5041';
   public  MET_TEST_ADDRESS: string = '0x15319c02e6f6b4FcB90b465c135c63dc84B9afFC'
+  public  CHANNEL_REGISTRY_TEST_ADDRESS: string = '0xc76E72deE2021cc51b094AfcD1e7010c74037bcB';
   /** MainNet IPFS */
   public IPFS_SERVER: string = 'https://ipfs.trinity-feeds.app/';
 
@@ -50,6 +57,8 @@ export class Tab1Page {
 
   public activeCount: number = null;
 
+  public channel = {name:null};
+
   constructor(public loadingController: LoadingController) {
 
   }
@@ -60,7 +69,7 @@ export class Tab1Page {
     this.galleriaABI = require("../../assets/contracts/galleriaABI.json");
     this.diamondABI = require("../../assets/contracts/diamond.json");
     this.metABI = require("../../assets/contracts/metABI.json");
-    console.log("this.stickerABI",this.stickerABI);
+    this.channelRegistryABI = require("../../assets/contracts/channelRegistryABI.json");
     this.handleContracts(this.curNetWork);
   }
 
@@ -414,4 +423,89 @@ async getSaleCount(){
     this.jsonUri = tokenInfo[3];
     this.tokenContent = JSON.stringify(tokenInfo);
   }
+
+  async channelPlatformAddress() {
+    await this.getWeb3();
+    let channelRegistryAddr = "";
+    if(this.curNetWork === "testNet"){
+      channelRegistryAddr = this.CHANNEL_REGISTRY_TEST_ADDRESS;
+    }else{
+      channelRegistryAddr = this.CHANNEL_REGISTRY_ADDRESS;
+    }
+    const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
+    const info = await channelRegistryContract.methods.platformAddress().call();
+    this.tokenContent = info;
+  }
+
+  async channelInfo() {
+    await this.getWeb3();
+    if(this.tokenId===""){
+      return;
+    }
+    let channelRegistryAddr = "";
+    if(this.curNetWork === "testNet"){
+      channelRegistryAddr = this.CHANNEL_REGISTRY_TEST_ADDRESS;
+    }else{
+      channelRegistryAddr = this.CHANNEL_REGISTRY_ADDRESS;
+    }
+    const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
+    const info = await channelRegistryContract.methods.channelInfo(this.tokenId).call();
+    this.tokenContent = JSON.stringify(info);
+  }
+
+  async totalSupply() {
+    console.log("====info====0");
+    await this.getWeb3();
+    // if(this.tokenId===""){
+    //   return;
+    // }
+    let channelRegistryAddr = "";
+    if(this.curNetWork === "testNet"){
+      channelRegistryAddr = this.CHANNEL_REGISTRY_TEST_ADDRESS;
+    }else{
+      channelRegistryAddr = this.CHANNEL_REGISTRY_ADDRESS;
+    }
+    const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
+    try {
+      const info = await channelRegistryContract.methods.totalSupply().call();
+      console.log("====info1111====",info);
+      this.tokenContent = info;
+    } catch (error) {
+      console.log("====error====",error);
+    }
+
+  }
+
+  async channelByIndex() {
+    await this.getWeb3();
+    if(this.tokenId===""){
+      return;
+    }
+    let channelRegistryAddr = "";
+    if(this.curNetWork === "testNet"){
+      channelRegistryAddr = this.CHANNEL_REGISTRY_TEST_ADDRESS;
+    }else{
+      channelRegistryAddr = this.CHANNEL_REGISTRY_ADDRESS;
+    }
+    const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
+    const info = await channelRegistryContract.methods.channelByIndex(this.tokenId).call();
+    this.tokenContent = JSON.stringify(info);
+  }
+
+  testname(name: string){
+    console.log("====testname=====",name);
+  }
+
+  resolveDidDocument(didString: string): Promise<DIDDocument> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const userDID = DID.from(didString)
+        const userDIDDocument = await userDID.resolve()
+        resolve(userDIDDocument);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
 }
