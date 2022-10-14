@@ -79,7 +79,9 @@
   "browser": {
     "http": false,
     "https": false,
-    "os": false
+    "os": false,
+    "fs": false,
+    "path": false
   },
   "description": "An Ionic project",
   "cordova": {

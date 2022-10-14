@@ -12,6 +12,13 @@ import { Claims, DIDDocument, JWTParserBuilder, JWT, DID, DIDURL, DIDBackend, De
 //Channel Registry proxy contract deployed to: 0xc76E72deE2021cc51b094AfcD1e7010c74037bcB
 //Channel Registry logic contract deployed to: 0xbfD859e5f5bFE659417cBb66d04f24294ddd1Ef3
 export class Tab1Page {
+
+  private totalNum: number = 7;
+  private startIndex: number = 0;
+  private endIndex: number = 0;
+  private pageSize: number = 8;
+
+
   public tokenContent: string = "";
   public stickerABI: string = "";
   public galleriaABI: string = "";
@@ -38,7 +45,8 @@ export class Tab1Page {
   public  PASAR_TEST_ADDRESS: string = '0x2652d10A5e525959F7120b56f2D7a9cD0f6ee087';
   public  GALLERIA_TEST_ADDRESS: string = '0x8b3c7Fc42d0501e0367d29426421D950f45F5041';
   public  MET_TEST_ADDRESS: string = '0x15319c02e6f6b4FcB90b465c135c63dc84B9afFC'
-  public  CHANNEL_REGISTRY_TEST_ADDRESS: string = '0xc76E72deE2021cc51b094AfcD1e7010c74037bcB';
+  //public  CHANNEL_REGISTRY_TEST_ADDRESS: string = '0xc76E72deE2021cc51b094AfcD1e7010c74037bcB';
+  public  CHANNEL_REGISTRY_TEST_ADDRESS: string = '0x38D3fE3C53698fa836Ba0c1e1DD8b1d8584127A7';
   /** MainNet IPFS */
   public IPFS_SERVER: string = 'https://ipfs.trinity-feeds.app/';
 
@@ -170,7 +178,8 @@ async setBridge(type: string){
     }else{
       baseUrl = this.IPFS_SERVER;
     }
-    baseUrl = baseUrl+"ipfs/"+this.jsonUri.replace("feeds:json:","").replace("meteast:json:","");;
+    baseUrl = baseUrl+"ipfs/"+this.tokenId.replace("feeds:json:","").replace("meteast:json:","");
+    console.log("============",)
     window.open(baseUrl, "_blank");
   }
 
@@ -424,18 +433,18 @@ async getSaleCount(){
     this.tokenContent = JSON.stringify(tokenInfo);
   }
 
-  async channelPlatformAddress() {
-    await this.getWeb3();
-    let channelRegistryAddr = "";
-    if(this.curNetWork === "testNet"){
-      channelRegistryAddr = this.CHANNEL_REGISTRY_TEST_ADDRESS;
-    }else{
-      channelRegistryAddr = this.CHANNEL_REGISTRY_ADDRESS;
-    }
-    const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
-    const info = await channelRegistryContract.methods.platformAddress().call();
-    this.tokenContent = info;
-  }
+  // async channelPlatformAddress() {
+  //   await this.getWeb3();
+  //   let channelRegistryAddr = "";
+  //   if(this.curNetWork === "testNet"){
+  //     channelRegistryAddr = this.CHANNEL_REGISTRY_TEST_ADDRESS;
+  //   }else{
+  //     channelRegistryAddr = this.CHANNEL_REGISTRY_ADDRESS;
+  //   }
+  //   const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
+  //   const info = await channelRegistryContract.methods.platformAddress().call();
+  //   this.tokenContent = info;
+  // }
 
   async channelInfo() {
     await this.getWeb3();
@@ -467,9 +476,28 @@ async getSaleCount(){
     }
     const channelRegistryContract = new this.web3.eth.Contract(this.channelRegistryABI,channelRegistryAddr);
     try {
+      let arr = [];
       const info = await channelRegistryContract.methods.totalSupply().call();
       console.log("====info1111====",info);
-      this.tokenContent = info;
+      for(let index=0;index<info;index++){
+        let info = await channelRegistryContract.methods.channelByIndex(index).call();
+        let tokenId = info[0];
+        let tokenUri = info[1];
+        let channelEntry = info[2];
+        let receiptAddr = info[3];
+        let ownerAddr = info[4];
+
+        let obj = {
+          tokenId : tokenId,
+          tokenUri: tokenUri,
+          channelEntry: channelEntry,
+          receiptAddr: receiptAddr,
+          ownerAddr: ownerAddr
+        }
+
+        arr.push(obj);
+      }
+      this.tokenContent = arr.length+"-'"+JSON.stringify(arr);
     } catch (error) {
       console.log("====error====",error);
     }
@@ -507,5 +535,36 @@ async getSaleCount(){
       }
     });
   }
+
+  test1(){
+    if(this.totalNum <= this.pageSize){
+      this.endIndex = this.totalNum - 1;
+      this.startIndex = 0;
+    }else{
+      this.endIndex = this.totalNum - 1;
+      this.startIndex = this.totalNum - this.pageSize;
+    }
+    console.log("========",this.startIndex,this.endIndex);
+    for(let index = this.endIndex; index >= this.startIndex;index--){
+     console.log("=====index======",index);
+    }
+  }
+
+  test2() {
+    if(this.startIndex === 0){
+      return;
+    }
+    this.endIndex = this.startIndex - 1;
+    if(this.startIndex - this.pageSize < 0){
+      this.startIndex = 0;
+    }else{
+      this.startIndex = this.startIndex - this.pageSize;
+    }
+    console.log("========",this.startIndex,this.endIndex);
+    for(let index = this.endIndex; index >= this.startIndex;index--){
+     console.log("=====index======",index);
+    }
+  }
+
 
 }
