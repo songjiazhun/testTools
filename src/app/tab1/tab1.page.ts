@@ -613,7 +613,8 @@ async getSaleCount(){
       let paidTo = info[3];
       let paidToken = info[4];
       let amount = this.web3.utils.fromWei(info[5],'ether');
-      let memo = info[6];
+      let sendUri = info[6];
+      let memo = info[7];
 
       let obj = {
         channelId : channelId,
@@ -622,6 +623,7 @@ async getSaleCount(){
         paidTo: paidTo,
         paidToken : paidToken,
         amount: amount,
+        sendUri:sendUri,
         memo: memo
       }
       arr.push(obj);
