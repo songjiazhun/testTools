@@ -38,7 +38,7 @@ export class Tab1Page {
   public STICKER_ADDRESS: string = '0x020c7303664bc88ae92cE3D380BF361E03B78B81';
   public PASAR_ADDRESS: string = '0x02E8AD0687D583e2F6A7e5b82144025f30e26aA0';
   public GALLERIA_ADDRESS: string = '0xE91F413953A82E15B92Ffb93818d8a7b87C3939B';
-  public CHANNEL_REGISTRY_ADDRESS: string = '';
+  public CHANNEL_REGISTRY_ADDRESS: string = '0xF5c140100F1E8475bc5097FF9D5689d043d9BE12';
   public CHANNEL_TIPPING_PAYMENT_ADDRESS: string = '';
   /** TestNet contract */
   public  DIAMONd_TEST_ADDRESS: string = '';
@@ -613,7 +613,7 @@ async getSaleCount(){
       let paidTo = info[3];
       let paidToken = info[4];
       let amount = this.web3.utils.fromWei(info[5],'ether');
-      let sendUri = info[6];
+      let senderUri = info[6];
       let memo = info[7];
 
       let obj = {
@@ -623,12 +623,52 @@ async getSaleCount(){
         paidTo: paidTo,
         paidToken : paidToken,
         amount: amount,
-        sendUri:sendUri,
+        senderUri:senderUri,
         memo: memo
       }
       arr.push(obj);
     }
     this.tokenContent = arr.length+"-'"+JSON.stringify(arr);
+  }
+
+  async tippingCount1(channelId: string, postId: string) {
+    await this.getWeb3();
+    let channelTippingPaymentAddr = "";
+    if(this.curNetWork === "testNet"){
+      channelTippingPaymentAddr = this.CHANNEL_TIPPING_PAYMENT_TEST_ADDRESS;
+    }else{
+      channelTippingPaymentAddr = this.CHANNEL_TIPPING_PAYMENT_ADDRESS;
+    }
+
+    const channelTippingPaymentContract = new this.web3.eth.Contract(this.channelTippingPaymentABI,channelTippingPaymentAddr);
+    try {
+      const info = await channelTippingPaymentContract.methods.tippingCount(channelId,postId).call();
+      console.log(info);
+      this.tokenContent = info;
+    } catch (error) {
+      console.log("info-====");
+    }
+
+
+  }
+
+  async tippingCount2(channelId: string, postId: string) {
+    await this.getWeb3();
+    let channelTippingPaymentAddr = "";
+    if(this.curNetWork === "testNet"){
+      channelTippingPaymentAddr = this.CHANNEL_TIPPING_PAYMENT_TEST_ADDRESS;
+    }else{
+      channelTippingPaymentAddr = this.CHANNEL_TIPPING_PAYMENT_ADDRESS;
+    }
+
+    const channelTippingPaymentContract = new this.web3.eth.Contract(this.channelTippingPaymentABI,channelTippingPaymentAddr);
+    const info = await channelTippingPaymentContract.methods.tippingCount(channelId,postId).call();
+    console.log(info);
+    let startIndex = 0;
+    let conut = info - 3;
+    const list = await channelTippingPaymentContract.methods.getTipping(channelId, postId,6,2).call();
+    console.log('=========',JSON.stringify(list));
+    this.tokenContent = list.length+"-"+JSON.stringify(list);
   }
 
 }
