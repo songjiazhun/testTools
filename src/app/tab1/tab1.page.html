@@ -12,6 +12,11 @@
       <ion-title size="large">old Contracts</ion-title>
     </ion-toolbar>
   </ion-header>
+<!--
+  <h1 text-center class="animated infinite rubberBand delay-1s">Example</h1> -->
+
+  <div class="animate__animated animate__bounce animate__delay-2s">Example</div>
+
   <ion-list>
     <ion-radio-group [(ngModel)] = "curNetWork" (ionChange)="handleContracts(curNetWork)">
       <ion-list-header>
@@ -44,7 +49,7 @@
     getTokenInfo()
   </ion-button>
   <br/> -->
-  <ion-button (click)="getBalance()">
+  <ion-button (click)="getBalance()" class="animate_bounceIn">
     getBalance()
   </ion-button>
 
@@ -157,6 +162,9 @@
   <ion-button (click)="tippingCount2('37040872628473093587867249605258468022921191625905424125638646020746029190138','37642162910262661905901770681207443888496762920528931135705813641122693593069')">
     tippingCount2
   </ion-button>
+
+  <ion-button expand="block" (click)="bounce()" #bouncebtn>Bounce</ion-button>
+
 
 
 
